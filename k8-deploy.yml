@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    run: amazing-playground
+  name: amazing-playground
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: amazing-playground
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        run: amazing-playground
+    spec:
+      containers:
+      - image: ubuntu
+        name: amazing-playground
+        command: ["sh", "-c", "sleep 3600"]
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "1"
+        volumeMounts:
+        - mountPath: "/amazing-playground"
+          name: playground-volume
+      volumes:
+        - name: playground-volume
+          persistentVolumeClaim:
+            claimName: amazing-playground-pvc
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: amazing-playground-pv
+  labels:
+    plyground: "amazing"
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Recycle
+  hostPath:
+    path: "/dev/amazing-playground"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: amazing-playground-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  selector:
+    matchLabels:
+      plyground: "amazing"
